@@ -1,0 +1,30 @@
+{
+  "name": "statstat",
+  "version": "0.0.1",
+  "description": "Static statistics of Ansible infrastucture",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/humppa/statstat.git"
+  },
+  "bin": {
+    "statstat": "./statstat.js"
+  },
+  "bugs": {
+    "url": "https://github.com/humppa/statstat/issues"
+  },
+  "keywords": [
+    "ansible",
+    "statistics"
+  ],
+  "author": "Tuomas Starck <dev@starck.fi>",
+  "license": "ISC",
+  "homepage": "https://github.com/humppa/statstat",
+  "dependencies": {
+    "express": "*",
+    "open": "*"
+  },
+  "files": [
+    "LICENSE"
+  ],
+  "devDependencies": {}
+}

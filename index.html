@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>statstat</title>
+
+<link rel="stylesheet" href="jquery.dynatable.css" />
+
+<style type="text/css">
+
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+body {
+  margin: 0;
+  padding: 0;
+  color: black;
+  background-color: white;
+}
+
+h1 {
+  margin: 0 0 1em 0;
+  padding: 0.6em 3em;
+  color: white;
+  background-color: #1f1e5f;
+  font-family: "Open Sans", sans-serif;
+}
+
+div {
+  margin: 1em 2em;
+}
+
+table {
+  width: 100%;
+  margin: 1em 0;
+}
+
+thead th {
+  font-weight: bold;
+  border-bottom: solid 2px #0d0c45;
+  padding: 0.5em 1.5em;
+}
+
+thead th a {
+  text-decoration: none;
+}
+
+thead th a:hover {
+}
+
+tbody td {
+  border-bottom: dotted 1px #1f1e5f;
+  padding: 0.4em 1.2em;
+}
+
+tr * {
+  color: #1f1e5f;
+  font-family: "Open Sans", sans-serif;
+}
+
+tr:hover * {
+  color: #0d0c45;
+}
+
+</style>
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="jquery.dynatable.js"></script>
+<script>
+
+var data = []
+var delay = 333
+var perpage = 20
+
+var mille = function(n, e) {
+  e = typeof e !== 'undefined'? e: 1;
+  return Math.round(n / Math.pow(1024, e))
+}
+
+var mounts = function(mounts) {
+  return mounts.map(function(m) {
+    return '<b>' + m.mount + '</b>: '
+      + mille(m.size_available, 3)
+      + ' <small>of</small> '
+      + mille(m.size_total, 3)
+  }).join('<br />')
+}
+
+var parseSet = function(json) {
+  data.push({
+    "name": json.hostvars.inventory_hostname,
+    "vcpus": json.hostvars.ansible_processor_vcpus,
+    "memory": mille(json.hostvars.ansible_memory_mb.real.total),
+    "mounts": mounts(json.hostvars.ansible_mounts),
+    "ip": json.hostvars.ansible_default_ipv4.address,
+    "os": json.hostvars.ansible_distribution + ' '
+      + json.hostvars.ansible_distribution_version
+      + '<br /><small>' + json.hostvars.ansible_kernel + '</small>'
+  })
+}
+
+var dynaSet = function() {
+  $('#statstat').dynatable({
+    dataset: { records: data }
+  })
+
+  dyna = $('#statstat').data('dynatable')
+  dyna.paginationPerPage.set(perpage)
+  dyna.dom.update()
+}
+
+$(document).ready(function() {
+  $.getJSON('/sets', function(sets) {
+    $.each(sets, function(i, val) {
+      $.getJSON(val, parseSet)
+    })
+  })
+
+  setTimeout(dynaSet, delay)
+})
+
+</script>
+</head>
+<body>
+
+<h1>statstat</h1>
+
+<div>
+<table id="statstat">
+<thead>
+<th>Name</th>
+<th>Vcpus</th>
+<th><span class="gb">Memory</span></th>
+<th><span class="gb">Mounts</span></th>
+<th>IP</th>
+<th>OS</th>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+</body>
+</html>

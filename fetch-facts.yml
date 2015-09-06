@@ -1,0 +1,11 @@
+---
+- hosts: all
+  sudo: yes
+
+  vars:
+  - tmpf: /tmp/ansible_facts.asc
+  - jsonf: "data/{{ inventory_hostname }}.json"
+
+  tasks:
+  - template: src=json.j2 dest={{ tmpf }}
+  - fetch: flat=yes src={{ tmpf }} dest={{ jsonf }}
